@@ -42,8 +42,10 @@ mnPalette <- colorBin(palette = "RdBu", domain = mnmap@data$MNLEGPERC2014,bins =
 mnpopup <- paste0("<b>","District: ","</b>", mnmap@data$DISTRICT, "<br>",
                   "<b>", "Representative: ", "</b>", mnmap@data$Name, "<br>",
                   "<b>", "Party: ", "</b>", mnmap@data$Party, "<br>",
-                  "<b>","Dem 2014: ","</b>", percent(mnmap@data$MNLEGPERC2014), "<br>",
-                  "<b>", "Pickup: ", "</b>", mnmap@data$Pickup)
+                  "<b>","DFL House 2014: ","</b>", percent(mnmap@data$MNLEGPERC2014), "<br>",
+                  "<b>", "Pickup: ", "</b>", mnmap@data$Pickup, "<br>",
+                  "<b>","DPI: ","</b>", percent(mnmap@data$DPI), "<br>",
+                  "<b>","Dem Base: ","</b>", percent(mnmap@data$DemBase))
 
 leaflet(mngeo2) %>%
   addProviderTiles("CartoDB.Positron") %>%
@@ -53,7 +55,11 @@ leaflet(mngeo2) %>%
               fillOpacity = .6, 
               popup=mnpopup,
               color= ~mnPalette(mnmap@data$MNLEGPERC2014)
-              )
+              )%>% addLegend("bottomright", pal = mnPalette, values = ~mnmap@data$MNLEGPERC2014, title = "Results",
+                             labFormat = labelFormat(transform = function(x) {
+                               print(x*100)
+                               }))
+
 #section for multi-layered
 minPct <- min(c(mnmap@data$MNLEGPERC2014, mnmap@data$MNGOVPERC2014, mnmap@data$DPI, mnmap@data$DemBase))
 maxPct <- max(c(mnmap@data$MNLEGPERC2014, mnmap@data$MNGOVPERC2014, mnmap@data$DPI, mnmap@data$DemBase))
@@ -91,7 +97,7 @@ mnResultmap <- leaflet(mngeo2) %>%
               popup=mnpopup, 
               color= ~paletteLayers(mnmap@data$MNLEGPERC2014),
               group="DFL House 2014"
-  ) %>%
+  ) %>% addLegend("bottomright", pal=paletteLayers, values = ~mnmap@data$MNLEGPERC2014, title = "Results") %>%
   
   addPolygons(stroke=TRUE,
               weight=1,
