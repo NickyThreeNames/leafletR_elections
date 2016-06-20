@@ -8,9 +8,9 @@ library("scales")
 
 datafile <- "data/election.csv"
 election <- rio::import(datafile)
-mnshape <- "data/L2012-1.shp"
+#mnshape <- "data/L2012-1.shp"
 mnshape2 <- "data/cb_2015_27_sldl_500k.shp"
-mngeo <- read_shape(file=mnshape)
+#mngeo <- read_shape(file=mnshape)
 mngeo <- read_shape(file=mnshape2)
 
 qtm(mngeo2)
@@ -30,19 +30,23 @@ mngeo@data$DISTRICT <- as.character(mngeo@data$NAME)
 mnmap <- append_data(mngeo, election, key.shp = "NAME", key.data="District")
 
 qtm(mnmap, "DemBase")
+minPct <- min(c(mnmap@data$MNLEGPERC2014, mnmap@data$MNGOVPERC2014))
+maxPct <- max(c(mnmap@data$MNLEGPERC2014, mnmap@data$MNGOVPERC2014))
+mnPalette1 <- colorNumeric(palette = "Blues", domain = mnmap@data$MNLEGPERC2014)
+qtm(shp = mnmap, fill = c("MNLEGPERC2014", "MNGOVPERC2014"), fill.palette = mnPalette1, ncol = 2)
 
-qtm(shp = mnmap, fill = c("MNLEGPERC2014", "MNGOVPERC2014"), fill.palette = "RdBu", ncol = 2)
+mnPalette <- colorNumeric(palette = "RdBlu", domain = mnmap@data$MNLEGPERC2014)
 
-mnPalette <- colorNumeric(palette = "Blues", domain = mnmap@data$MNLEGPERC2014)
-
-mnpopup <- paste0("District: ", mnmap@data$DISTRICT, "Dem Candidate '14: ", percent(mnmap@data$MNLEGPERC2014))
+mnpopup <- paste0("<b>","District: ","</b>", mnmap@data$DISTRICT, "<br>",
+                  "<b>", "Representative: ", "</b>", mnmap@data$Name, "<br>",
+                  "<b>","Dem Candidate '14: ","</b>", percent(mnmap@data$MNLEGPERC2014), "<br>")
 
 leaflet(mngeo2) %>%
   addProviderTiles("CartoDB.Positron") %>%
   addPolygons(stroke=TRUE, 
-              smoothFactor = 0.5,
+              smoothFactor = 0.2,
               weight = 1,
-              fillOpacity = .9, 
+              fillOpacity = .8, 
               popup=mnpopup,
               color= ~mnPalette(mnmap@data$MNLEGPERC2014)
               )
