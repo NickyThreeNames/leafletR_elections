@@ -55,10 +55,11 @@ leaflet(mngeo2) %>%
               fillOpacity = .6, 
               popup=mnpopup,
               color= ~mnPalette(mnmap@data$MNLEGPERC2014)
-              )%>% addLegend("bottomright", pal = mnPalette, values = ~mnmap@data$MNLEGPERC2014, title = "Results",
-                             labFormat = labelFormat(transform = function(x) {
-                               print(x*100)
-                               }))
+              )%>% addLegend("bottomright", pal = mnPalette, values = ~mnmap@data$MNLEGPERC2014, title = "Results %",
+                             labFormat = labelFormat(suffix = '%', between = '% - ',
+                                                     transform = function(x) 100 * x))
+
+
 
 #section for multi-layered
 minPct <- min(c(mnmap@data$MNLEGPERC2014, mnmap@data$MNGOVPERC2014, mnmap@data$DPI, mnmap@data$DemBase))
@@ -97,7 +98,9 @@ mnResultmap <- leaflet(mngeo2) %>%
               popup=mnpopup, 
               color= ~paletteLayers(mnmap@data$MNLEGPERC2014),
               group="DFL House 2014"
-  ) %>% addLegend("bottomright", pal=paletteLayers, values = ~mnmap@data$MNLEGPERC2014, title = "Results") %>%
+  ) %>% addLegend("bottomright", pal = mnPalette, values = ~mnmap@data$MNLEGPERC2014, title = "Results",
+                  labFormat = labelFormat(suffix = '%', between = '%-',
+                                          transform = function(x) 100 * x)) %>%
   
   addPolygons(stroke=TRUE,
               weight=1,
